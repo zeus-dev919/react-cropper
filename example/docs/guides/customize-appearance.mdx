@@ -1,0 +1,206 @@
+---
+title: Customize Appearance
+sidebar_position: 5
+---
+
+import { OverlayColorExample } from '../../src/components/examples/OverlayColorExample';
+import { CustomPreviewExample } from '../../src/components/examples/CustomPreviewExample';
+import { CropperStructure } from '../../src/components/schemes/Appearance/CropperStructure';
+import { StencilStructure } from '../../src/components/schemes/Appearance/StencilStructure';
+
+## Introduction
+
+It should be noticed, you can create your own cropper component from a scratch. The default cropper component is described by  nearly three hundreds lines of straightforward code, and most of them are typings.
+
+But the prebuilt component is so flex, that you maybe don't need that possibility at all. This article
+describes the main approaches to customize the prebuilt cropper appearance.
+
+## Cropper Appearance
+The cropper without stencil has about the following structure. Just the wrapper of cropper and background image.
+
+<CropperStructure/>
+
+### Wrapper
+
+Wrapper is the root cropper component. You can replace the default cropper wrapper component by prop `wrapperComponent`.
+It can be useful to create a custom loading indicator [[1]](https://github.com/advanced-cropper/react-advanced-cropper/blob/master/example/src/components/showcase/Telegram/components/CropperWrapper.tsx),
+add navigation buttons
+[[1]](https://github.com/advanced-cropper/react-advanced-cropper/blob/master/example/src/components/showcase/Telegram/components/CropperWrapper.tsx),
+[[2]](/docs/tutorials/absolute-zoom), etc.
+
+Also you can set an arbitrary class name for the wrapper by prop `className`. It's useful to change the background color under the background image..
+
+### Background Image
+
+Background image is the current image that should be cropper. Similarly you can replace the default background component by prop `backgroundComponent`, it's useful for the cases
+when you need, for example, apply custom filters for an image [[1]](/docs/tutorials/image-editor).
+
+Also you can set an arbitrary class name for the background by prop `backgroundClassName`.
+
+## Stencil Appearance
+
+You can create your own stencils in a numerous ways. It's the most flexible and thorough going approach to customize the stencil, and it's described
+in [the corresponding tutorial](/docs/tutorials/custom-stencil). But there is an easier way and it will be described customizing of default stencils like [RectangleStencil](/docs/components/RectangleStencil) or [CircleStencil](/docs/components/CircleStencil).
+
+Just like any other stencil they are placed inside wrapper:
+
+<StencilStructure/>
+
+### Basics
+
+To customize the default stencils you should pass props to `stencilProps` props as object (read [here](/docs/guides/#passing-props-to-the-stencil) in detail).
+
+### Handler
+
+You are able to customize handle by the following ways:
+- change handler component
+- add custom handler classnames
+- remove or add handlers at one of six positions
+
+
+#### Change handler component
+
+To change handler component just pass the name of globally registered handler component or handler component options object to `handlerComponent` prop.
+
+```tsx
+<Cropper
+	src={img}
+	stencilProps={{
+		handlerComponent: CustomHandler
+	}}
+/>
+```
+
+#### Customize the classnames
+
+To add handler classnames you should pass an object to `handlerClassNames` prop. All available classnames are represented at the example below
+
+```tsx
+<Cropper
+	src={img}
+	stencilProps={{
+		handlerClassNames: {
+			default: 'handler',
+			hover: 'handler--hover',
+			eastNorth: 'handler--east-north',
+			north: 'handler--north',
+			westNorth: 'handler--west-north',
+			west: 'handler--west',
+			westSouth: 'handler--west-south',
+			south: 'handler--south',
+			eastSouth: 'handler--east-south',
+			east: 'handler--ease',
+		}
+	}}
+/>
+```
+
+Pay attention to `default` classname. If you want just change classname of a handler you should anyway pass an object:
+```tsx
+<Cropper
+	stencilProps={{
+		handlerClassNames: {
+			default: 'handler',
+		}
+	}}
+/>
+```
+
+Notice, you can customize `handlerWrapperClassNames` in the similar way.
+
+#### Customize the list of handlers
+
+To change the list of handlers you should pass an object `handlers` to stencil props.
+
+```tsx
+<Cropper
+	src={img}
+	stencilProps={{
+		handlers: {
+			eastNorth: true,
+			north: false,
+			westNorth: true,
+			west: false,
+			westSouth: true,
+			south: false,
+			eastSouth: true,
+			east: false,
+		}
+	}}
+/>
+```
+
+:::warning Remember!
+If you don't set `[direction]: true` the corresponding handler will be hidden, so if you pass an empty object all handlers will be hidden.
+:::
+
+### Lines
+
+You are able to customize lines by the same three ways:
+- change line component (`lineComponent`)
+- add custom line classnames (`lineClassNames`)
+- remove or add lines at one of four positions (`lines`)
+
+Line component by default is [SimpleLine](/components/simple-line.html). Each line is a narrow block with applied border style. So to change the appearance of line you should change the border style.
+
+The example is given below
+```css
+.line {
+	border-style: dashed;
+	border-color: red;
+}
+```
+
+:::warning Know issue
+Currently there are problems with changing the line width. If you need to set the line width, set only the corresponding width:
+```css
+.cropper__line--left {
+	border-left-width: 2px;
+}
+.cropper__line--top {
+	border-top-width: 2px;
+}
+```
+:::
+
+Notice, you can customize `lineWrapperClassNames` in the similar way.
+
+
+### Overlay
+
+To change the overlay appearance you can use `overlayClassName`. The default overlay is implemented in a tricky way via `box-shadow`,
+so the possibilities to customize is pretty limited. The most common way to customize one is setting the overlay color.
+
+```tsx
+<Cropper
+	src={img}
+	stencilProps={{
+		overlayClassName: 'overlay'
+	}}
+/>
+```
+```css
+.overlay {
+	color: #601f55eb;
+}
+```
+<OverlayColorExample/>
+
+### Preview
+
+The necessity to change preview appearance is pretty rare. But if you want to change it you may pass custom classname to `previewClassName` prop.
+
+```tsx
+<Cropper
+	src={img}
+	stencilProps={{
+		previewClassName: 'preview'
+	}}
+/>
+```
+```css
+.preview {
+	border: dashed 2px rgba(255,255,255, 0.25);
+}
+```
+<CustomPreviewExample/>

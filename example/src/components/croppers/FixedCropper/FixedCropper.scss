@@ -1,0 +1,18 @@
+.fixed-cropper {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	background: black;
+}
+
+.fixed-cropper-stencil {
+	&__overlay, &__preview {
+		border-radius: 10px;
+		&--circle {
+			border-radius: 50%;
+		}
+	}
+	&__preview {
+		border: solid 2px rgba(white, 0.5);
+	}
+}

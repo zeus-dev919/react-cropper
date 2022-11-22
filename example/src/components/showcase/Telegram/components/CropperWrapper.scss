@@ -1,0 +1,46 @@
+$spinner-color: currentColor;
+
+.telegram-cropper-wrapper {
+	padding: 30px 30px;
+	overflow: hidden;
+	background: black;
+	max-height: 100%;
+	&--with-navigation {
+		padding-bottom: 80px;
+	}
+
+	&__content {
+		position: relative;
+	}
+
+	&__fade {
+		flex-grow: 1;
+		min-height: 0;
+	}
+
+	&__navigation {
+		position: absolute;
+		bottom: 0;
+		max-width: 450px;
+		width: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	&__spinner {
+		visibility: hidden;
+		opacity: 0;
+		transition: 0.5s;
+		transition-delay: 0s;
+		stroke: $spinner-color;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		&--visible {
+			transition-delay: 0.5s;
+			opacity: 1;
+			visibility: visible;
+		}
+	}
+}

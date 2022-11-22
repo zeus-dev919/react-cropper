@@ -1,0 +1,138 @@
+---
+sidebar_position: 6
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import TOCInline from "@theme/TOCInline";
+
+# FAQ
+
+## Contents
+
+<TOCInline toc={toc} />
+
+## How to get the default state?
+
+To get the default state you can use the corresponding cropper method.
+
+```tsx
+const cropperRef = useRef<CropperRef>(null);
+
+const getDefaultState = () => {
+	return cropperRef.current?.getDefaultState();
+}
+```
+```tsx
+<Cropper
+	ref={cropperRef}
+/>
+```
+
+If you use transitions, rotate an image a lot, and try to set the default state you can encounter the situation that
+image begins rolling like a barrel. It's proper behaviour, because angles are accumulating, and `state.transforms.rotate` can become
+`360`, `720`, `1440`, etc. degrees.
+
+To get more expected behavior you can get the closer angle (i.e. if you resetting angle to `0` from `270`, the angle `360` will be the closer to `270` than `0`,):
+```tsx
+import { getCloserAngle } from 'advanced-cropper'
+```
+```tsx
+const getDefaultState = () => {
+	const currentState = cropperRef.current?.getState();
+	const defaultState = cropperRef.current?.getDefaultState();
+	return currentState && defaultState
+		? {
+				...defaultState,
+				transforms: {
+					...defaultState.transforms,
+					rotate: getCloserAngle(currentState.transforms.rotate, defaultState.transforms.rotate),
+				},
+			}
+		: null;
+};
+```
+
+## How to check if the cropper is dirty?
+
+Get [the default state](/docs/faq#how-to-get-the-default-state) and compare this state with
+the current state:
+```tsx
+import { isEqualState } from 'advanced-cropper';
+```
+```tsx
+const isDirty = !isEqualState(cropper.getState(), defaultState);
+```
+
+
+## I want to add an additional property to the cropper. How to do it?
+
+It depends on what kind of setting you want to add.
+
+### Cropper's parts
+
+<Tabs>
+<TabItem value="stencil" label="Stencil" default>
+
+```tsx
+<Cropper
+	stencilComponent={CustomStencil}
+	stencilProps={{
+		color: 'red'
+	}}
+/>
+```
+
+The prop `color` will be passed into `CustomStencil`.
+
+</TabItem>
+<TabItem value="wrapper" label="Wrapper">
+
+```tsx
+<Cropper
+	wrapperComponent={CustomWrapper}
+	wrapperProps={{
+		navigation: true
+	}}
+/>
+```
+
+The prop `navigation` will be passed into `CustomWrapper`.
+
+</TabItem>
+<TabItem value="backgroundWrapper" label="BackgroundWrapper">
+
+```tsx
+<Cropper
+	backgroundWrapperComponent={CustomBackgroundWrapper}
+	backgroundWrapperProps={{
+		smooth: true
+	}}
+/>
+```
+
+The prop `smooth` will be passed into `CustomBackgroundWrapper`.
+
+</TabItem>
+</Tabs>
+
+
+### Cropper's settings
+
+If you want to add the custom cropper's setting field, that will be used in its internal algorithms (such as `defaultSize`, `sizeRestrictions`, etc.)
+you can use the generic nature of cropper components:
+```tsx
+interface CustomSettings {
+	stencilType: string;
+}
+```
+```tsx
+<Cropper<CustomSettings>
+	stencilType={'circle'}
+	defaultSize={(state, settings) => {
+		if (settings.stencilType === 'circle') {
+			// something
+		}
+	}}
+/>
+```
